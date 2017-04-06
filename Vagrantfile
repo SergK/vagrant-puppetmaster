@@ -11,28 +11,28 @@ Vagrant.configure("2") do |config|
   # phase
   config.ssh.insert_key = false
 
+  config.vm.define "puppetmaster", primary: true do |puppetmaster|
+    #puppetmaster.vm.network "forwarded_port", guest: 80, host: 8888
+    puppetmaster.vm.box = "minimal/jessie64"
+    puppetmaster.vm.host_name = "puppetmaster.test.local"
+    puppetmaster.vm.network "private_network", ip: "192.168.56.102"
 
-  config.vm.box = "minimal/xenial64"
-  config.vm.box_check_update = false
+    # puppetmaster.vm.synced_folder "../puppet-manifests/hiera/", "/var/lib/hiera", owner: "root", group: "root"
+    # puppetmaster.vm.synced_folder "../puppet-manifests/modules/", "/usr/share/puppet/modules", owner: "root", group: "root"
+    # puppetmaster.vm.synced_folder "../puppet-manifests/manifests/", "/etc/puppet/manifests", owner: "root", group: "root"
+    # puppetmaster.vm.synced_folder "../puppet-manifests/bin", "/etc/puppet/bin", owner: "root", group: "root"
 
-  config.vm.network "private_network", ip: "192.168.56.102"
-
-  config.vm.synced_folder "../data", "/vagrant_data", disabled: true
-
-  config.vm.provider "virtualbox" do |vb|
-    # Display the VirtualBox GUI when booting the machine
-    vb.gui = true
-    # Customize the amount of memory on the VM:
-    vb.memory = "2048"
+      puppetmaster.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--name", "puppetmaster"]
+        v.customize ["modifyvm", :id, "--memory", "1024"]
+        v.customize ["modifyvm", :id, "--cpus", "1"]
+        v.customize ["modifyvm", :id, "--ioapic", "on"]
+        v.gui = false
+      end
   end
 
   config.vm.provision "file", source: "./authorized_keys", destination: "~/.ssh/authorized_keys"
 
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   apt-get update
-  #   apt-get install -y apache2
-  # SHELL
+  config.vm.provision :shell, path: "./bootstrap.sh"
+
 end
