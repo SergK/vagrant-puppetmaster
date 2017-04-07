@@ -17,7 +17,7 @@ Vagrant.configure("2") do |config|
     # let's use minimal/jessie64 image which has all the required vbox ext
     # debian/jessie64 a little bit buggy and requires additional configrations
     # and plugins
-    puppetmaster.vm.box = "minimal/jessie64"
+    puppetmaster.vm.box = "sergk/jessie64"
     puppetmaster.vm.host_name = "puppetmaster.test.local"
     puppetmaster.vm.network "private_network", ip: "192.168.56.102"
 

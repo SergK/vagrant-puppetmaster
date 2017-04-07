@@ -10,8 +10,16 @@ sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive \
   apt-get -y -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" dist-upgrade
 
-# install packages
-sudo apt-get install -y puppet
+# install puppet stuff from puppetlabs
+# wget https://apt.puppetlabs.com/puppetlabs-release-pc1-jessie.deb
+# sudo dpkg -i puppetlabs-release-pc1-jessie.deb
+
+# add backports repo
+echo 'deb http://ftp.debian.org/debian jessie-backports main' | \
+  sudo tee --append /etc/apt/sources.list
+
+sudo apt-get update
+sudo apt-get install -y puppet -t jessie-backports
 
 # clean-up a little
 sudo apt-get autoremove -y
