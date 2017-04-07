@@ -13,14 +13,22 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "puppetmaster", primary: true do |puppetmaster|
     #puppetmaster.vm.network "forwarded_port", guest: 80, host: 8888
+
+    # let's use minimal/jessie64 image which has all the required vbox ext
+    # debian/jessie64 a little bit buggy and requires additional configrations
+    # and plugins
     puppetmaster.vm.box = "minimal/jessie64"
     puppetmaster.vm.host_name = "puppetmaster.test.local"
     puppetmaster.vm.network "private_network", ip: "192.168.56.102"
 
-    # puppetmaster.vm.synced_folder "../puppet-manifests/hiera/", "/var/lib/hiera", owner: "root", group: "root"
-    # puppetmaster.vm.synced_folder "../puppet-manifests/modules/", "/usr/share/puppet/modules", owner: "root", group: "root"
-    # puppetmaster.vm.synced_folder "../puppet-manifests/manifests/", "/etc/puppet/manifests", owner: "root", group: "root"
-    # puppetmaster.vm.synced_folder "../puppet-manifests/bin", "/etc/puppet/bin", owner: "root", group: "root"
+    # disable default vagrant folder mounting
+    puppetmaster.vm.synced_folder "./", "/vagrant", disabled: true
+
+    # inject puppet stuff
+    puppetmaster.vm.synced_folder "../puppet-manifests/hiera/", "/var/lib/hiera", owner: "root", group: "root"
+    puppetmaster.vm.synced_folder "../puppet-manifests/modules/", "/usr/share/puppet/modules", owner: "root", group: "root"
+    puppetmaster.vm.synced_folder "../puppet-manifests/manifests/", "/etc/puppet/manifests", owner: "root", group: "root"
+    puppetmaster.vm.synced_folder "../puppet-manifests/bin", "/etc/puppet/bin", owner: "root", group: "root"
 
       puppetmaster.vm.provider "virtualbox" do |v|
         v.customize ["modifyvm", :id, "--name", "puppetmaster"]
