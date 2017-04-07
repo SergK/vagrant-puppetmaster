@@ -31,8 +31,8 @@ sudo tee -a /etc/hosts <<EOF
 EOF
 
 if grep "^puppetmaster" /etc/hostname; then
-  # install git
-  sudo apt-get install -y git
+  # install apt-transport-https
+  sudo apt-get install -y apt-transport-https
 
   # create dir for
   # sudo mkdir -p /var/lib/hiera
