@@ -1,7 +1,5 @@
 #!/bin/bash -x
 
-export DEBIAN_FRONTEND=noninteractive
-
 # use closer mirrors on nodes start
 sed -i 's/\.us\./\.ua\./g' /etc/apt/sources.list
 
@@ -19,7 +17,7 @@ echo 'deb http://ftp.debian.org/debian jessie-backports main' | \
   sudo tee --append /etc/apt/sources.list
 
 sudo apt-get update
-sudo apt-get install -y puppet -t jessie-backports
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y puppet -t jessie-backports
 
 # clean-up a little
 sudo apt-get autoremove -y
@@ -40,7 +38,7 @@ EOF
 
 if grep "^puppetmaster" /etc/hostname; then
   # install apt-transport-https
-  sudo apt-get install -y apt-transport-https
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y apt-transport-https
 
   # create dir for
   # sudo mkdir -p /var/lib/hiera
