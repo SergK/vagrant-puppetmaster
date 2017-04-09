@@ -19,19 +19,18 @@ Vagrant.configure("2") do |config|
     # and plugins
     puppetmaster.vm.box = "sergk/jessie64"
     puppetmaster.vm.host_name = "puppetmaster.test.local"
-    # puppetmaster.vm.network "private_network", ip: "192.168.56.102"
 
     # disable default vagrant folder mounting
     puppetmaster.vm.synced_folder "./", "/vagrant", disabled: true
 
-    # inject puppet stuff
-    puppetmaster.vm.synced_folder "../puppet-manifests/hiera/", "/var/lib/hiera", owner: "root", group: "root"
-    puppetmaster.vm.synced_folder "../puppet-manifests/modules/", "/usr/share/puppet/modules", owner: "root", group: "root"
-    puppetmaster.vm.synced_folder "../puppet-manifests/manifests/", "/etc/puppet/manifests", owner: "root", group: "root"
-    puppetmaster.vm.synced_folder "../puppet-manifests/bin", "/etc/puppet/bin", owner: "root", group: "root"
-
     puppetmaster.vm.provider "virtualbox" do |v, vboxoverride|
       vboxoverride.vm.network "private_network", ip: "192.168.56.102"
+      # inject puppet stuff
+      vboxoverride.vm.synced_folder "../puppet-manifests/hiera/", "/var/lib/hiera", owner: "root", group: "root"
+      vboxoverride.vm.synced_folder "../puppet-manifests/modules/", "/usr/share/puppet/modules", owner: "root", group: "root"
+      vboxoverride.vm.synced_folder "../puppet-manifests/manifests/", "/etc/puppet/manifests", owner: "root", group: "root"
+      vboxoverride.vm.synced_folder "../puppet-manifests/bin", "/etc/puppet/bin", owner: "root", group: "root"
+
       v.customize ["modifyvm", :id, "--name", "puppetmaster"]
       v.customize ["modifyvm", :id, "--memory", "1024"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
@@ -44,7 +43,14 @@ Vagrant.configure("2") do |config|
       override.vm.network :private_network,
                         libvirt__ip: "192.168.56.102",
                         libvirt__dhcp_enabled: false
-      lv.memory = 1024
+
+      # inject puppet stuff
+      override.vm.synced_folder "../puppet-manifests/hiera/", "/var/lib/hiera", type: "nfs"
+      override.vm.synced_folder "../puppet-manifests/modules/", "/usr/share/puppet/modules", type: "nfs"
+      override.vm.synced_folder "../puppet-manifests/manifests/", "/etc/puppet/manifests", type: "nfs"
+      override.vm.synced_folder "../puppet-manifests/bin", "/etc/puppet/bin", type: "nfs"
+
+      lv.memory = 2048
       lv.cpus = 1
       lv.nested = true
       lv.volume_cache = 'unsafe'
