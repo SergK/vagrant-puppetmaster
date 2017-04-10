@@ -3,27 +3,23 @@
 # use closer mirrors on nodes start
 sed -i 's/\.us\./\.ua\./g' /etc/apt/sources.list
 
+# install puppet stuff from puppetlabs
+wget -q https://apt.puppetlabs.com/puppetlabs-release-pc1-jessie.deb \
+  -O /tmp/puppetlabs-release-pc1-jessie.deb
+sudo dpkg -i /tmp/puppetlabs-release-pc1-jessie.deb
+
 # update everything
 sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive \
   apt-get -y -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" dist-upgrade
 
-# install puppet stuff from puppetlabs
-# wget https://apt.puppetlabs.com/puppetlabs-release-pc1-jessie.deb
-# sudo dpkg -i puppetlabs-release-pc1-jessie.deb
-
-# add backports repo
-echo 'deb http://ftp.debian.org/debian jessie-backports main' | \
-  sudo tee --append /etc/apt/sources.list
-
-sudo apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y puppet -t jessie-backports
+sudo apt-get install puppet-agent
 
 # clean-up a little
 sudo apt-get autoremove -y
 
 # add server to config
-sed -i '/ssldir/a \server=puppetmaster.test.local' /etc/puppet/puppet.conf
+# sed -i '/ssldir/a \server=puppetmaster.test.local' /etc/puppet/puppet.conf
 
 sudo tee -a /etc/hosts <<EOF
 
@@ -36,13 +32,9 @@ sudo tee -a /etc/hosts <<EOF
 
 EOF
 
-if grep "^puppetmaster" /etc/hostname; then
+if grep -q "^puppetmaster" /etc/hostname; then
   # install apt-transport-https
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y apt-transport-https
-
-  # create dir for
-  # sudo mkdir -p /var/lib/hiera
-  # sudo chown root:root -R /var/lib/hiera
 
   # install puppet master
   # FACTER_LOCATION="${LOCATION}" sudo /etc/puppet/bin/install_puppet_master.sh
